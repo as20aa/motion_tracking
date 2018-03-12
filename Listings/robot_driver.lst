@@ -1,0 +1,235 @@
+C51 COMPILER V9.56.0.0   ROBOT_DRIVER                                                      03/13/2018 00:32:41 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE ROBOT_DRIVER
+OBJECT MODULE PLACED IN .\Objects\robot_driver.obj
+COMPILER INVOKED BY: D:\Software\Keil\C51\BIN\C51.EXE robot_driver.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.
+                    -\Listings\robot_driver.lst) TABS(2) OBJECT(.\Objects\robot_driver.obj)
+
+line level    source
+
+   1          #include "robot_driver.h"
+   2          #include "reg51.h"
+   3          
+   4          
+   5          
+   6          void right_leg(int num[8])
+   7          {
+   8   1        //先做数据修正
+   9   1        num[5]=300-num[5];
+  10   1        if(num[5]<500)
+  11   1          num[5]=500;
+  12   1        if(num[5]>2500)
+  13   1          num[5]=2500;
+  14   1        num[4]=1800-0.7*(1250-num[5]);
+  15   1        if(num[4]<500)
+  16   1          num[4]=500;
+  17   1        if(num[4]>2500)
+  18   1          num[4]=2500;
+  19   1        //右脚驱动程序
+  20   1        SBUF=0X55;
+  21   1        while(!TI);TI=0;
+  22   1        SBUF=0X55;
+  23   1        while(!TI);TI=0;
+  24   1        SBUF=0x14;
+  25   1        while(!TI);TI=0;
+  26   1        SBUF=0X03;
+  27   1        while(!TI);TI=0;
+  28   1        SBUF=0X05;
+  29   1        while(!TI);TI=0;
+  30   1        SBUF=0XF4;
+  31   1        while(!TI);TI=0;
+  32   1        SBUF=0X01;
+  33   1        while(!TI);TI=0;
+  34   1        SBUF=0X09;
+  35   1        while(!TI);TI=0;
+  36   1        SBUF=0XDC;
+  37   1        while(!TI);TI=0;
+  38   1        SBUF=0X05;
+  39   1        while(!TI);TI=0;
+  40   1        SBUF=0X0A;//控制10号舵机
+  41   1        while(!TI);TI=0;
+  42   1        SBUF=num[4]&0XFF;//4号陀螺仪低八位
+  43   1        while(!TI);TI=0;
+  44   1        SBUF=(num[4]>>8);//4号陀螺仪高八位
+  45   1        while(!TI);TI=0;
+  46   1        SBUF=0X0B;
+  47   1        while(!TI);TI=0;
+  48   1        SBUF=0XDC;
+  49   1        while(!TI);TI=0;
+  50   1        SBUF=0X05;
+  51   1        while(!TI);TI=0;
+  52   1        SBUF=0X0C;//控制12号舵机
+  53   1        while(!TI);TI=0;
+  54   1        SBUF=num[5]&0xff;//5号陀螺仪低八位
+C51 COMPILER V9.56.0.0   ROBOT_DRIVER                                                      03/13/2018 00:32:41 PAGE 2   
+
+  55   1        while(!TI);TI=0;
+  56   1        SBUF=(num[5]>>8);//5号陀螺仪高八位
+  57   1        while(!TI);TI=0;
+  58   1        SBUF=0X0D;
+  59   1        while(!TI);TI=0;
+  60   1        SBUF=0XAA;
+  61   1        while(!TI);TI=0;
+  62   1        SBUF=0X05;
+  63   1        while(!TI);TI=0;
+  64   1      }
+  65          void left_leg(int num[8])
+  66          {
+  67   1        //先做数据修正
+  68   1        num[1]=num[1]+2700;
+  69   1        if(num[1]<500)
+  70   1          num[1]=500;
+  71   1        if(num[1]>2500)
+  72   1          num[1]=2500;
+  73   1        num[0]=0.7*num[1]-10;
+  74   1        if(num[0]<500)
+  75   1          num[0]=500;
+  76   1        if(num[0]>2500)
+  77   1          num[0]=2500;
+  78   1        //左脚驱动程序
+  79   1        SBUF=0X55;
+  80   1        while(!TI);TI=0;
+  81   1        SBUF=0X55;
+  82   1        while(!TI);TI=0;
+  83   1        SBUF=0x14;
+  84   1        while(!TI);TI=0;
+  85   1        SBUF=0X03;
+  86   1        while(!TI);TI=0;
+  87   1        SBUF=0X05;
+  88   1        while(!TI);TI=0;
+  89   1        SBUF=0XF4;
+  90   1        while(!TI);TI=0;
+  91   1        SBUF=0X01;
+  92   1        while(!TI);TI=0;
+  93   1        SBUF=0X01;
+  94   1        while(!TI);TI=0;
+  95   1        SBUF=0XDC;
+  96   1        while(!TI);TI=0;
+  97   1        SBUF=0X05;
+  98   1        while(!TI);TI=0;
+  99   1        SBUF=0X02;//控制2号舵机
+ 100   1        while(!TI);TI=0;
+ 101   1        SBUF=num[0]&0XFF;//4号陀螺仪低八位
+ 102   1        while(!TI);TI=0;
+ 103   1        SBUF=(num[0]>>8);//4号陀螺仪高八位
+ 104   1        while(!TI);TI=0;
+ 105   1        SBUF=0X03;
+ 106   1        while(!TI);TI=0;
+ 107   1        SBUF=0XDC;
+ 108   1        while(!TI);TI=0;
+ 109   1        SBUF=0X05;
+ 110   1        while(!TI);TI=0;
+ 111   1        SBUF=0X04;//控制4号舵机
+ 112   1        while(!TI);TI=0;
+ 113   1        SBUF=num[1]&0xff;//5号陀螺仪低八位
+ 114   1        while(!TI);TI=0;
+ 115   1        SBUF=(num[1]>>8);//5号陀螺仪高八位
+ 116   1        while(!TI);TI=0;
+C51 COMPILER V9.56.0.0   ROBOT_DRIVER                                                      03/13/2018 00:32:41 PAGE 3   
+
+ 117   1        SBUF=0X05;
+ 118   1        while(!TI);TI=0;
+ 119   1        SBUF=0XDC;
+ 120   1        while(!TI);TI=0;
+ 121   1        SBUF=0X05;
+ 122   1        while(!TI);TI=0;
+ 123   1      }
+ 124          void left_hand(int num[8])
+ 125          {
+ 126   1        //先做数据修正
+ 127   1        num[3]=1350-num[3];
+ 128   1        if(num[3]<500)
+ 129   1          num[3]=500;
+ 130   1        if(num[3]>2500)
+ 131   1          num[3]=2500;
+ 132   1        num[2]=3050-num[2]-num[3];
+ 133   1        if(num[2]<500)
+ 134   1          num[2]=500;
+ 135   1        if(num[2]>2500)
+ 136   1          num[2]=2500;
+ 137   1        //左手驱动程序
+ 138   1        SBUF=0X55;
+ 139   1        while(!TI);TI=0;
+ 140   1        SBUF=0X55;
+ 141   1        while(!TI);TI=0;
+ 142   1        SBUF=0X0B;
+ 143   1        while(!TI);TI=0;
+ 144   1        SBUF=0X03;
+ 145   1        while(!TI);TI=0;
+ 146   1        SBUF=0X02;
+ 147   1        while(!TI);TI=0;
+ 148   1        SBUF=0XF4;
+ 149   1        while(!TI);TI=0;
+ 150   1        SBUF=0X01;
+ 151   1        while(!TI);TI=0;
+ 152   1        SBUF=0X06;
+ 153   1        while(!TI);TI=0;
+ 154   1        SBUF=num[2]&0xff;
+ 155   1        while(!TI);TI=0;
+ 156   1        SBUF=(num[2]>>8);
+ 157   1        while(!TI);TI=0;
+ 158   1        SBUF=0X07;
+ 159   1        while(!TI);TI=0;
+ 160   1        SBUF=num[3]&0xff;
+ 161   1        while(!TI);TI=0;
+ 162   1        SBUF=(num[3]>>8);
+ 163   1        while(!TI);TI=0;
+ 164   1      }
+ 165          void right_hand(int num[8])
+ 166          {
+ 167   1        //先做数据修正
+ 168   1        num[7]=num[7]+1650;
+ 169   1        if(num[7]<500)
+ 170   1          num[7]=500;
+ 171   1        if(num[7]>2500)
+ 172   1          num[7]=2500;
+ 173   1        num[6]=2000+num[6]-num[7];
+ 174   1        if(num[6]<500)
+ 175   1          num[6]=500;
+ 176   1        if(num[6]>2500)
+ 177   1          num[6]=2500;
+ 178   1        //右手驱动程序
+C51 COMPILER V9.56.0.0   ROBOT_DRIVER                                                      03/13/2018 00:32:41 PAGE 4   
+
+ 179   1        SBUF=0X55;
+ 180   1        while(!TI);TI=0;
+ 181   1        SBUF=0X55;
+ 182   1        while(!TI);TI=0;
+ 183   1        SBUF=0X0B;
+ 184   1        while(!TI);TI=0;
+ 185   1        SBUF=0X03;
+ 186   1        while(!TI);TI=0;
+ 187   1        SBUF=0X02;
+ 188   1        while(!TI);TI=0;
+ 189   1        SBUF=0XF4;
+ 190   1        while(!TI);TI=0;
+ 191   1        SBUF=0X01;
+ 192   1        while(!TI);TI=0;
+ 193   1        SBUF=0X0E;
+ 194   1        while(!TI);TI=0;
+ 195   1        SBUF=num[6]&0xff;
+ 196   1        while(!TI);TI=0;
+ 197   1        SBUF=(num[6]>>8);
+ 198   1        while(!TI);TI=0;
+ 199   1        SBUF=0X0F;
+ 200   1        while(!TI);TI=0;
+ 201   1        SBUF=num[7]&0xff;
+ 202   1        while(!TI);TI=0;
+ 203   1        SBUF=(num[7]>>8);
+ 204   1        while(!TI);TI=0;
+ 205   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1491    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       6
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

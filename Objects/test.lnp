@@ -1,0 +1,7 @@
+".\Objects\main.obj",
+".\Objects\i2c.obj",
+".\Objects\uart.obj",
+".\Objects\move.obj",
+".\Objects\robot_driver.obj" 
+TO ".\Objects\test" 
+PRINT(".\Listings\test.m51") RAMSIZE(256) 

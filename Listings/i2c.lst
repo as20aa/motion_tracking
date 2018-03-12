@@ -1,0 +1,211 @@
+C51 COMPILER V9.56.0.0   I2C                                                               03/13/2018 00:23:06 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE I2C
+OBJECT MODULE PLACED IN .\Objects\i2c.obj
+COMPILER INVOKED BY: D:\Software\Keil\C51\BIN\C51.EXE i2c.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings
+                    -\i2c.lst) TABS(2) OBJECT(.\Objects\i2c.obj)
+
+line level    source
+
+   1          #include "i2c.h"
+   2          #include "reg52.h"
+   3          
+   4          
+   5          
+   6          //**************************************
+   7          //延时5微秒(STC90C52RC@12M)
+   8          //不同的工作环境,需要调整此函数
+   9          //当改用1T的MCU时,请调整此延时函数
+  10          //**************************************
+  11          void Delay5us(void)
+  12          {
+  13   1        _nop_();_nop_();_nop_();_nop_();
+  14   1        _nop_();_nop_();_nop_();_nop_();
+  15   1        _nop_();_nop_();_nop_();_nop_();
+  16   1        _nop_();_nop_();_nop_();_nop_();
+  17   1        _nop_();_nop_();_nop_();_nop_();
+  18   1        _nop_();_nop_();_nop_();_nop_();
+  19   1      }
+  20          //**************************************
+  21          //I2C起始信号
+  22          //**************************************
+  23          void I2C_Start(void)
+  24          {
+  25   1          P1 = 0XFF;                    //拉高数据线
+  26   1          P0 = 0XFF;                    //拉高时钟线
+  27   1          Delay5us();                 //延时
+  28   1          P1 = 0;                    //产生下降沿
+  29   1          Delay5us();                 //延时
+  30   1          P0 = 0;                    //拉低时钟线
+  31   1      }
+  32          //**************************************
+  33          //I2C停止信号
+  34          //**************************************
+  35          void I2C_Stop()
+  36          {
+  37   1          P1 = 0;                    //拉低数据线
+  38   1          P0 = 0XFF;                    //拉高时钟线
+  39   1          Delay5us();                 //延时
+  40   1          P1 = 0XFF;                    //产生上升沿
+  41   1          Delay5us();                 //延时
+  42   1      }
+  43          //**************************************
+  44          //I2C发送应答信号
+  45          //入口参数:ack (0:ACK 1:NAK)
+  46          //**************************************
+  47          void I2C_SendACK(bit ack)
+  48          {
+  49   1        if(ack==1)
+  50   1          P1 = 0XFF;                  //写应答信号
+  51   1        else
+  52   1          P1 = 0;
+  53   1          P0 = 0XFF;                    //拉高时钟线
+  54   1          Delay5us();                 //延时
+C51 COMPILER V9.56.0.0   I2C                                                               03/13/2018 00:23:06 PAGE 2   
+
+  55   1          P0 = 0;                    //拉低时钟线
+  56   1          Delay5us();                 //延时
+  57   1      }
+  58          //**************************************
+  59          //I2C接收应答信号
+  60          //**************************************
+  61          unsigned char I2C_RecvACK()
+  62          {
+  63   1        unsigned char buf;
+  64   1          P0 = 0XFF;                    //拉高时钟线
+  65   1          Delay5us();                 //延时
+  66   1          buf = P1;                   //读应答信号
+  67   1          P0 = 0;                    //拉低时钟线
+  68   1          Delay5us();                 //延时
+  69   1          return buf;
+  70   1      }
+  71          //**************************************
+  72          //向I2C总线发送一个字节数据
+  73          //**************************************
+  74          void I2C_SendByte(uchar dat)
+  75          {
+  76   1          uchar i;
+  77   1          for (i=0; i<8; i++)         //8位计数器
+  78   1          {
+  79   2              dat <<= 1;              //移出数据的最高位
+  80   2              if(CY==1)               //送数据口
+  81   2                P1 = 0XFF;
+  82   2              else
+  83   2                P1 = 0;
+  84   2              P0 = 0XFF;                //拉高时钟线
+  85   2              Delay5us();             //延时
+  86   2              P0 = 0;                //拉低时钟线
+  87   2              Delay5us();             //延时
+  88   2          }
+  89   1          I2C_RecvACK();
+  90   1      }
+  91          //**************************************
+  92          //从I2C总线接收一个字节数据
+  93          //**************************************
+  94          void I2C_RecvByte(unsigned char* buf)//buf由上一级函数提供
+  95          {
+  96   1          uchar i;
+  97   1          P1 = 0XFF;                    //使能内部上拉,准备读取数据,
+  98   1          for (i=0; i<8; i++)         //8位计数器
+  99   1          {
+ 100   2              P0 = 0XFF;                //拉高时钟线
+ 101   2              Delay5us();             //延时
+ 102   2              *(buf+i) = P1;             //读数据               
+ 103   2              P0 = 0;                //拉低时钟线
+ 104   2              Delay5us();             //延时
+ 105   2          }
+ 106   1      }
+ 107          //**************************************
+ 108          //向I2C设备写入一个字节数据
+ 109          //**************************************
+ 110          void Single_WriteI2C(uchar REG_Address,uchar REG_data)
+ 111          {
+ 112   1          I2C_Start();                  //起始信号
+ 113   1          I2C_SendByte(SlaveAddress);   //发送设备地址+写信号
+ 114   1          I2C_SendByte(REG_Address);    //内部寄存器地址，
+ 115   1          I2C_SendByte(REG_data);       //内部寄存器数据，
+ 116   1          I2C_Stop();                   //发送停止信号
+C51 COMPILER V9.56.0.0   I2C                                                               03/13/2018 00:23:06 PAGE 3   
+
+ 117   1      }
+ 118          //**************************************
+ 119          //从I2C设备读八个字节数据
+ 120          //**************************************
+ 121          void Single_ReadI2C(uchar REG_Address,uchar temp[16])
+ 122          {
+ 123   1        //从传感器读取一次数据
+ 124   1        //读取的数据根据传入的REG_Address决定
+ 125   1        //返回的是一个大小为16的uchar数组
+ 126   1        unsigned char i,j,k;
+ 127   1        uchar buf[8];
+ 128   1        I2C_Start();                   //起始信号
+ 129   1        I2C_SendByte(SlaveAddress);    //发送设备地址+写信号
+ 130   1        I2C_SendByte(REG_Address);     //发送存储单元地址，从0开始  
+ 131   1        I2C_Start();                   //起始信号
+ 132   1        I2C_SendByte(SlaveAddress+1);  //发送设备地址+读信号
+ 133   1        I2C_RecvByte(buf);       //读出寄存器数据
+ 134   1        I2C_SendACK(1);                //接收应答信号
+ 135   1        I2C_Stop();                    //停止信号
+ 136   1        //将buf转化，将buf全部转化为temp
+ 137   1        ////////////////////////
+ 138   1        //处理得到的八个字节的数据
+ 139   1        //问题就在将buf转换成temp上！
+ 140   1        ////////////////////////
+ 141   1        if(REG_Address&0x01)//当为奇数时即为高八位的数据
+ 142   1        {
+ 143   2          for(j=0;j<8;j++)
+ 144   2          {
+ 145   3            for(i=0;i<8;i++)
+ 146   3            {
+ 147   4              temp[j]<<=1;
+ 148   4              buf[i]<<=1;//注意使用的顺序！如果是使用在TEMP做位移前则CY表示的时TEMP位移的结果！
+ 149   4              if(CY==1)
+ 150   4              temp[j]=temp[j]+1;
+ 151   4            }
+ 152   3          }//temp[j]代表的是第j个传感器的数据
+ 153   2        }
+ 154   1        else
+ 155   1        {
+ 156   2          for(j=8;j<16;j++)
+ 157   2          {
+ 158   3            for(i=0;i<8;i++)
+ 159   3            {
+ 160   4              temp[j]<<=1;
+ 161   4              buf[i]<<=1;//注意使用的顺序！如果是使用在TEMP做位移前则CY表示的时TEMP位移的结果！
+ 162   4              if(CY==1)
+ 163   4              temp[j]=temp[j]+1;
+ 164   4            }
+ 165   3          }//temp[j]代表的是第j个传感器的数据
+ 166   2        }
+ 167   1        
+ 168   1      }
+*** WARNING C280 IN LINE 126 OF i2c.c: 'k': unreferenced local variable
+ 169          //MPU6050操作函数
+ 170          //**************************************
+ 171          //初始化MPU6050
+ 172          //**************************************
+ 173          void InitMPU6050()
+ 174          {
+ 175   1        Single_WriteI2C(PWR_MGMT_1, 0x00);  //解除休眠状态
+ 176   1        Single_WriteI2C(SMPLRT_DIV, 0x07);
+ 177   1        Single_WriteI2C(CONFIG, 0x06);
+C51 COMPILER V9.56.0.0   I2C                                                               03/13/2018 00:23:06 PAGE 4   
+
+ 178   1        Single_WriteI2C(GYRO_CONFIG, 0x18);
+ 179   1        Single_WriteI2C(ACCEL_CONFIG, 0x01);
+ 180   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    405    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      16
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

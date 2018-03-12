@@ -1,0 +1,41 @@
+C51 COMPILER V9.56.0.0   MOVE                                                              03/13/2018 00:23:06 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE MOVE
+OBJECT MODULE PLACED IN .\Objects\move.obj
+COMPILER INVOKED BY: D:\Software\Keil\C51\BIN\C51.EXE move.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listing
+                    -s\move.lst) TABS(2) OBJECT(.\Objects\move.obj)
+
+line level    source
+
+   1          #include "move.h"
+   2          #include "i2c.h"
+   3          #include "uart.h"
+   4          
+   5          void move(unsigned char number,int position)
+   6          {
+   7   1        SeriPushSend(0x55);
+   8   1        SeriPushSend(0x55);
+   9   1        SeriPushSend(0x08);
+  10   1        SeriPushSend(0x03);
+  11   1        SeriPushSend(0x01);
+  12   1        SeriPushSend(0xE8);
+  13   1        SeriPushSend(0x03);
+  14   1        SeriPushSend(number);
+  15   1        SeriPushSend(position&0xff);//µÍ8Î»ÌáÇ°
+  16   1        SeriPushSend(position>>8);
+  17   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     62    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
