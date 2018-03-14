@@ -127,6 +127,19 @@ void transform(int num[8],unsigned char temp[16])
 			num[i]=num[i]/17;//缩小num变化范围，使其在0~2000之间变动
 		}
 }
+void send_data(unsigned char num[8])
+{
+	int i;
+	for(i=0;i<8;i++)
+	{
+		SBUF=num[i];
+		while(!TI)TI=0;
+	}
+	SBUF=0X0D;
+	while(!TI)TI=0;
+	SBUF=0X0A;
+	while(!TI)TI=0;
+}
 
 //*********************************************************
 //主程序
@@ -148,14 +161,15 @@ void main()
 		//修正程序以及偏移量见本程序所在文件夹内“修正.txt”
 		//num[2]=num[2]-num[0]+1500;
 		//数据转换部分
+		//将收集到的数据传送给上位机
+		send_data(num);
+		//right_leg(num);//右腿的驱动
 		
-		right_leg(num);//右腿的驱动
+		//left_leg(num);//左腿的驱动
 		
-		left_leg(num);//左腿的驱动
+		//left_hand(num);//左手的驱动
 		
-		left_hand(num);//左手的驱动
-		
-		right_hand(num);//右手的驱动
+		//right_hand(num);//右手的驱动
 		delay(100);
 	}
 }
